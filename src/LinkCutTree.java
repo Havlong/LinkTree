@@ -21,7 +21,7 @@ public class LinkCutTree implements TreeStructure {
      * Performs Zig or Zag rotation based on node provided
      * <p>
      * (I do not understand a thing, check
-     * <a href="https://codeforces.com/blog/entry/69879?locale=ru&f0a28=1">original code</a> or
+     * <a href="https://codeforces.com/blog/entry/69879">original code</a> or
      * <a href="https://neerc.ifmo.ru/wiki/index.php?title=Link-Cut_Tree">description</a>)
      *
      * @param nodeId {@link Node} to perform tree rotation around
