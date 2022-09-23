@@ -1,4 +1,4 @@
-# LinkCutTree
+# LinkTree
 
 Light-Weight Link-Cut Tree implementation on Java language.
 
