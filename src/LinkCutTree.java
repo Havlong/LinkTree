@@ -1,5 +1,6 @@
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 public class LinkCutTree implements TreeStructure {
     private final ArrayList<Node> tree = new ArrayList<>();
@@ -10,11 +11,11 @@ public class LinkCutTree implements TreeStructure {
      * @param nodeId nodeId of {@link Node} to check
      * @return false if node is splay-tree root else true
      */
-    private boolean isNotRoot(int nodeId) {
+    private boolean isNotRoot(Integer nodeId) {
         Integer parentNodeId = tree.get(nodeId).parentNodeId;
         if (parentNodeId == null) return false;
         Node parentNode = tree.get(parentNodeId);
-        return parentNode.leftNodeId == nodeId || parentNode.rightNodeId == nodeId;
+        return Objects.equals(parentNode.leftNodeId, nodeId) || Objects.equals(parentNode.rightNodeId, nodeId);
     }
 
     /**
@@ -26,19 +27,19 @@ public class LinkCutTree implements TreeStructure {
      *
      * @param nodeId {@link Node} to perform tree rotation around
      */
-    private void rotate(int nodeId) {
+    private void rotate(Integer nodeId) {
         Node node = tree.get(nodeId);
 
         assert node.parentNodeId != null;
 
-        int p = node.parentNodeId;
+        Integer p = node.parentNodeId;
         Integer g = tree.get(p).parentNodeId;
 
         if (g != null) {
             Node grandParent = tree.get(g);
-            if (grandParent.leftNodeId == p) {
+            if (Objects.equals(grandParent.leftNodeId, p)) {
                 grandParent.leftNodeId = nodeId;
-            } else if (grandParent.rightNodeId == p) {
+            } else if (Objects.equals(grandParent.rightNodeId, p)) {
                 grandParent.rightNodeId = nodeId;
             }
         }
@@ -46,7 +47,7 @@ public class LinkCutTree implements TreeStructure {
         node.parentNodeId = g;
         Node parent = tree.get(p);
 
-        if (parent.leftNodeId == nodeId) {
+        if (Objects.equals(parent.leftNodeId, nodeId)) {
             parent.leftNodeId = node.rightNodeId;
             if (parent.leftNodeId != null) tree.get(parent.leftNodeId).parentNodeId = p;
             node.rightNodeId = p;
@@ -63,12 +64,12 @@ public class LinkCutTree implements TreeStructure {
      *
      * @param nodeId {@link Node} to put in the root
      */
-    private void splay(int nodeId) {
+    private void splay(Integer nodeId) {
         while (isNotRoot(nodeId)) {
-            int parentNodeId = tree.get(nodeId).parentNodeId; // parent of nodeId
+            Integer parentNodeId = tree.get(nodeId).parentNodeId; // parent of nodeId
             if (isNotRoot(parentNodeId)) { // do zig-zig or zig-zag
-                int grandParentNodeId = tree.get(parentNodeId).parentNodeId; // grandparent of nodeId
-                boolean doZigZig = (nodeId == tree.get(parentNodeId).leftNodeId) == (parentNodeId == tree.get(grandParentNodeId).leftNodeId);
+                Integer grandParentNodeId = tree.get(parentNodeId).parentNodeId; // grandparent of nodeId
+                boolean doZigZig = (nodeId.equals(tree.get(parentNodeId).leftNodeId)) == (parentNodeId.equals(tree.get(grandParentNodeId).leftNodeId));
                 rotate(doZigZig ? parentNodeId : nodeId);
             }
             rotate(nodeId);
@@ -95,6 +96,7 @@ public class LinkCutTree implements TreeStructure {
     private void link(int addedNodeId, int linkingNodeId) {
         if (hasPath(addedNodeId, linkingNodeId) || isNotRoot(addedNodeId)) return;
         tree.get(addedNodeId).parentNodeId = linkingNodeId;
+        expose(addedNodeId);
     }
 
     /**
