@@ -2,7 +2,8 @@
 
 Light-Weight Link-Cut Tree implementation on Java language.
 
-Implementation is based on [this repository](https://github.com/udovin/AlgoBook/blob/master/source/link_cut_tree.cpp)
+Implementation was based on [this repository](https://github.com/udovin/AlgoBook/blob/master/source/link_cut_tree.cpp)
+but I would trust only [this implementation](https://codeforces.com/contest/117/submission/860934)
 
 You can find description of those functions [here](https://codeforces.com/blog/entry/69879)
 
