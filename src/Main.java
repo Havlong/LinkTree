@@ -9,8 +9,6 @@ public class Main {
     }
 
     public static boolean testTreeStructure(TreeStructure treeStructure) {
-        int treeSize = 8;
-
         int node1 = treeStructure.addRoot();
         int node2 = treeStructure.add(node1);
         int node3 = treeStructure.add(node1);
@@ -20,10 +18,10 @@ public class Main {
         int node7 = treeStructure.add(node4);
         int node8 = treeStructure.add(node7);
 
-        List<Integer> path = treeStructure.getRootPath(node7, treeSize);
+        for (int node : List.of(node1, node2, node3, node4, node5, node6, node7, node8)) {
+            if (treeStructure.rootId(node) != node1) return false;
+        }
 
-        return path.equals(List.of(node4, node2, node1)) &&
-                treeStructure.getLca(node5, node8) == node4 &&
-                treeStructure.getLca(node3, node6) == node1;
+        return treeStructure.getLca(node5, node8) == node4 && treeStructure.getLca(node3, node6) == node1;
     }
 }

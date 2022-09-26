@@ -1,5 +1,4 @@
 import java.util.ArrayList;
-import java.util.List;
 
 public class BinUps implements TreeStructure {
     public static final ArrayList<BinUpsNode> tree = new ArrayList<>();
@@ -38,17 +37,8 @@ public class BinUps implements TreeStructure {
     }
 
     @Override
-    public List<Integer> getRootPath(int nodeId, int limit) {
-        ArrayList<Integer> rootPath = new ArrayList<>();
-
-        BinUpsNode node = tree.get(nodeId);
-        for (int i = 0; i < limit; i++) {
-            node = tree.get(node.parentNodeId);
-            rootPath.add(node.nodeId);
-            if (node.parentNodeId == node.nodeId) break;
-        }
-
-        return rootPath;
+    public int rootId(int nodeId) {
+        return findLevelAncestor(nodeId, tree.get(nodeId).depth);
     }
 
     @Override

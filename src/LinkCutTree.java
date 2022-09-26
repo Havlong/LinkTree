@@ -1,5 +1,4 @@
 import java.util.ArrayList;
-import java.util.List;
 import java.util.Objects;
 
 public class LinkCutTree implements TreeStructure {
@@ -28,8 +27,8 @@ public class LinkCutTree implements TreeStructure {
         parent.parentNodeId = node.nodeId;
         if ((node.parentNodeId = grandParentNodeId) != null) {
             LCTNode grandParentNode = tree.get(grandParentNodeId);
-            if (grandParentNode.leftNodeId == parent.nodeId) grandParentNode.leftNodeId = nodeId;
-            else if (grandParentNode.rightNodeId == parent.nodeId) grandParentNode.rightNodeId = nodeId;
+            if (Objects.equals(grandParentNode.leftNodeId, parent.nodeId)) grandParentNode.leftNodeId = nodeId;
+            else if (Objects.equals(grandParentNode.rightNodeId, parent.nodeId)) grandParentNode.rightNodeId = nodeId;
         }
     }
 
@@ -43,8 +42,8 @@ public class LinkCutTree implements TreeStructure {
         parent.parentNodeId = nodeId;
         if ((node.parentNodeId = grandParentNodeId) != null) {
             LCTNode grandParentNode = tree.get(grandParentNodeId);
-            if (grandParentNode.leftNodeId == parent.nodeId) grandParentNode.leftNodeId = nodeId;
-            else if (grandParentNode.rightNodeId == parent.nodeId) grandParentNode.rightNodeId = nodeId;
+            if (Objects.equals(grandParentNode.leftNodeId, parent.nodeId)) grandParentNode.leftNodeId = nodeId;
+            else if (Objects.equals(grandParentNode.rightNodeId, parent.nodeId)) grandParentNode.rightNodeId = nodeId;
         }
     }
 
@@ -61,7 +60,7 @@ public class LinkCutTree implements TreeStructure {
                 else rotateLeft(nodeId);
             } else {
                 LCTNode grandParentNode = tree.get(parentNode.parentNodeId);
-                if (grandParentNode.leftNodeId == parentNode.nodeId) {
+                if (Objects.equals(grandParentNode.leftNodeId, parentNode.nodeId)) {
                     if (Objects.equals(parentNode.leftNodeId, nodeId)) {
                         rotateRight(parentNode.nodeId);
                         rotateRight(nodeId);
@@ -134,23 +133,16 @@ public class LinkCutTree implements TreeStructure {
     }
 
     @Override
-    public List<Integer> getRootPath(int nodeId, int limit) {
-        ArrayList<Integer> rootPath = new ArrayList<>();
-
-        expose(nodeId);
-        while (tree.get(nodeId).rightNodeId != null && rootPath.size() < limit) {
-            nodeId = tree.get(nodeId).rightNodeId;
-            rootPath.add(nodeId);
-        }
-        splay(nodeId);
-
-        return rootPath;
-    }
-
-    @Override
     public Integer getLca(int firstNodeId, int secondNodeId) {
         if (!hasPath(firstNodeId, secondNodeId)) return null;
         expose(firstNodeId);
         return expose(secondNodeId);
+    }
+
+    public int rootId(int nodeId) {
+        expose(nodeId);
+        while (tree.get(nodeId).rightNodeId != null) nodeId = tree.get(nodeId).rightNodeId;
+        splay(nodeId);
+        return nodeId;
     }
 }

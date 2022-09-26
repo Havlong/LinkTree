@@ -18,7 +18,6 @@ public class BinUpsNode {
 
         if (parentNode.depth - firstJump.depth == firstJump.depth - secondJump.depth)
             this.jumpNodeId = secondJump.nodeId;
-        else
-            this.jumpNodeId = this.parentNodeId;
+        else this.jumpNodeId = this.parentNodeId;
     }
 }
