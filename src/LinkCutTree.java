@@ -11,52 +11,41 @@ public class LinkCutTree implements TreeStructure {
      * @param nodeId nodeId of {@link LCTNode} to check
      * @return false if node is splay-tree root else true
      */
-    private boolean isNotRoot(Integer nodeId) {
-        Integer parentNodeId = tree.get(nodeId).parentNodeId;
-        if (parentNodeId == null) return false;
-        LCTNode parentNode = tree.get(parentNodeId);
-        return Objects.equals(parentNode.leftNodeId, nodeId) || Objects.equals(parentNode.rightNodeId, nodeId);
+    private boolean isRoot(Integer nodeId) {
+        LCTNode node = tree.get(nodeId);
+        if (node.parentNodeId == null) return true;
+        LCTNode parentNode = tree.get(node.parentNodeId);
+        return !Objects.equals(parentNode.leftNodeId, nodeId) && !Objects.equals(parentNode.rightNodeId, nodeId);
     }
 
-    /**
-     * Performs Zig or Zag rotation based on node provided
-     * <p>
-     * (I do not understand a thing, check
-     * <a href="https://codeforces.com/blog/entry/69879">original code</a> or
-     * <a href="https://neerc.ifmo.ru/wiki/index.php?title=Link-Cut_Tree">description</a>)
-     *
-     * @param nodeId {@link LCTNode} to perform tree rotation around
-     */
-    private void rotate(Integer nodeId) {
-        LCTNode node = tree.get(nodeId);
-
-        assert node.parentNodeId != null;
-
-        Integer p = node.parentNodeId;
-        Integer g = tree.get(p).parentNodeId;
-
-        if (g != null) {
-            LCTNode grandParent = tree.get(g);
-            if (Objects.equals(grandParent.leftNodeId, p)) {
-                grandParent.leftNodeId = nodeId;
-            } else if (Objects.equals(grandParent.rightNodeId, p)) {
-                grandParent.rightNodeId = nodeId;
-            }
+    private void rotateRight(Integer nodeId) {
+        LCTNode node = tree.get(nodeId), parent = tree.get(node.parentNodeId);
+        Integer grandParentNodeId = parent.parentNodeId;
+        if ((parent.leftNodeId = node.rightNodeId) != null) {
+            tree.get(parent.leftNodeId).parentNodeId = parent.nodeId;
         }
-
-        node.parentNodeId = g;
-        LCTNode parent = tree.get(p);
-
-        if (Objects.equals(parent.leftNodeId, nodeId)) {
-            parent.leftNodeId = node.rightNodeId;
-            if (parent.leftNodeId != null) tree.get(parent.leftNodeId).parentNodeId = p;
-            node.rightNodeId = p;
-        } else {
-            parent.rightNodeId = node.leftNodeId;
-            if (parent.rightNodeId != null) tree.get(parent.rightNodeId).parentNodeId = p;
-            node.leftNodeId = p;
+        node.rightNodeId = parent.nodeId;
+        parent.parentNodeId = node.nodeId;
+        if ((node.parentNodeId = grandParentNodeId) != null) {
+            LCTNode grandParentNode = tree.get(grandParentNodeId);
+            if (grandParentNode.leftNodeId == parent.nodeId) grandParentNode.leftNodeId = nodeId;
+            else if (grandParentNode.rightNodeId == parent.nodeId) grandParentNode.rightNodeId = nodeId;
         }
+    }
+
+    private void rotateLeft(Integer nodeId) {
+        LCTNode node = tree.get(nodeId), parent = tree.get(node.parentNodeId);
+        Integer grandParentNodeId = parent.parentNodeId;
+        if ((parent.rightNodeId = node.leftNodeId) != null) {
+            tree.get(parent.rightNodeId).parentNodeId = parent.nodeId;
+        }
+        node.leftNodeId = parent.nodeId;
         parent.parentNodeId = nodeId;
+        if ((node.parentNodeId = grandParentNodeId) != null) {
+            LCTNode grandParentNode = tree.get(grandParentNodeId);
+            if (grandParentNode.leftNodeId == parent.nodeId) grandParentNode.leftNodeId = nodeId;
+            else if (grandParentNode.rightNodeId == parent.nodeId) grandParentNode.rightNodeId = nodeId;
+        }
     }
 
     /**
@@ -65,14 +54,31 @@ public class LinkCutTree implements TreeStructure {
      * @param nodeId {@link LCTNode} to put in the root
      */
     private void splay(Integer nodeId) {
-        while (isNotRoot(nodeId)) {
-            Integer parentNodeId = tree.get(nodeId).parentNodeId; // parent of nodeId
-            if (isNotRoot(parentNodeId)) { // do zig-zig or zig-zag
-                Integer grandParentNodeId = tree.get(parentNodeId).parentNodeId; // grandparent of nodeId
-                boolean doZigZig = (nodeId.equals(tree.get(parentNodeId).leftNodeId)) == (parentNodeId.equals(tree.get(grandParentNodeId).leftNodeId));
-                rotate(doZigZig ? parentNodeId : nodeId);
+        while (!isRoot(nodeId)) {
+            LCTNode node = tree.get(nodeId), parentNode = tree.get(node.parentNodeId);
+            if (isRoot(parentNode.nodeId)) {
+                if (Objects.equals(parentNode.leftNodeId, nodeId)) rotateRight(nodeId);
+                else rotateLeft(nodeId);
+            } else {
+                LCTNode grandParentNode = tree.get(parentNode.parentNodeId);
+                if (grandParentNode.leftNodeId == parentNode.nodeId) {
+                    if (Objects.equals(parentNode.leftNodeId, nodeId)) {
+                        rotateRight(parentNode.nodeId);
+                        rotateRight(nodeId);
+                    } else {
+                        rotateLeft(nodeId);
+                        rotateRight(nodeId);
+                    }
+                } else {
+                    if (Objects.equals(parentNode.rightNodeId, nodeId)) {
+                        rotateLeft(parentNode.nodeId);
+                        rotateLeft(nodeId);
+                    } else {
+                        rotateRight(nodeId);
+                        rotateLeft(nodeId);
+                    }
+                }
             }
-            rotate(nodeId);
         }
     }
 
@@ -86,7 +92,7 @@ public class LinkCutTree implements TreeStructure {
         Integer lastNode = null;
         for (Integer parentNode = nodeId; parentNode != null; parentNode = tree.get(parentNode).parentNodeId) {
             splay(parentNode);
-            tree.get(parentNode).rightNodeId = lastNode;
+            tree.get(parentNode).leftNodeId = lastNode;
             lastNode = parentNode;
         }
         splay(nodeId);
@@ -94,9 +100,9 @@ public class LinkCutTree implements TreeStructure {
     }
 
     private void link(int addedNodeId, int linkingNodeId) {
-        if (hasPath(addedNodeId, linkingNodeId) || isNotRoot(addedNodeId)) return;
-        tree.get(addedNodeId).parentNodeId = linkingNodeId;
         expose(addedNodeId);
+        if (tree.get(addedNodeId).rightNodeId != null) return;
+        tree.get(addedNodeId).parentNodeId = linkingNodeId;
     }
 
     /**
@@ -132,11 +138,11 @@ public class LinkCutTree implements TreeStructure {
         ArrayList<Integer> rootPath = new ArrayList<>();
 
         expose(nodeId);
-        while (tree.get(nodeId).leftNodeId != null && rootPath.size() < limit) {
-            nodeId = tree.get(nodeId).leftNodeId;
+        while (tree.get(nodeId).rightNodeId != null && rootPath.size() < limit) {
+            nodeId = tree.get(nodeId).rightNodeId;
             rootPath.add(nodeId);
         }
-        expose(nodeId);
+        splay(nodeId);
 
         return rootPath;
     }
