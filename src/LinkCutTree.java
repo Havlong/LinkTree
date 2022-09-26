@@ -139,6 +139,7 @@ public class LinkCutTree implements TreeStructure {
         return expose(secondNodeId);
     }
 
+    @Override
     public int rootId(int nodeId) {
         expose(nodeId);
         while (tree.get(nodeId).rightNodeId != null) nodeId = tree.get(nodeId).rightNodeId;
