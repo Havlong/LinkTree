@@ -3,18 +3,18 @@ import java.util.List;
 import java.util.Objects;
 
 public class LinkCutTree implements TreeStructure {
-    private final ArrayList<Node> tree = new ArrayList<>();
+    public final ArrayList<LCTNode> tree = new ArrayList<>();
 
     /**
      * Checks if node is splay-tree root
      *
-     * @param nodeId nodeId of {@link Node} to check
+     * @param nodeId nodeId of {@link LCTNode} to check
      * @return false if node is splay-tree root else true
      */
     private boolean isNotRoot(Integer nodeId) {
         Integer parentNodeId = tree.get(nodeId).parentNodeId;
         if (parentNodeId == null) return false;
-        Node parentNode = tree.get(parentNodeId);
+        LCTNode parentNode = tree.get(parentNodeId);
         return Objects.equals(parentNode.leftNodeId, nodeId) || Objects.equals(parentNode.rightNodeId, nodeId);
     }
 
@@ -25,10 +25,10 @@ public class LinkCutTree implements TreeStructure {
      * <a href="https://codeforces.com/blog/entry/69879">original code</a> or
      * <a href="https://neerc.ifmo.ru/wiki/index.php?title=Link-Cut_Tree">description</a>)
      *
-     * @param nodeId {@link Node} to perform tree rotation around
+     * @param nodeId {@link LCTNode} to perform tree rotation around
      */
     private void rotate(Integer nodeId) {
-        Node node = tree.get(nodeId);
+        LCTNode node = tree.get(nodeId);
 
         assert node.parentNodeId != null;
 
@@ -36,7 +36,7 @@ public class LinkCutTree implements TreeStructure {
         Integer g = tree.get(p).parentNodeId;
 
         if (g != null) {
-            Node grandParent = tree.get(g);
+            LCTNode grandParent = tree.get(g);
             if (Objects.equals(grandParent.leftNodeId, p)) {
                 grandParent.leftNodeId = nodeId;
             } else if (Objects.equals(grandParent.rightNodeId, p)) {
@@ -45,7 +45,7 @@ public class LinkCutTree implements TreeStructure {
         }
 
         node.parentNodeId = g;
-        Node parent = tree.get(p);
+        LCTNode parent = tree.get(p);
 
         if (Objects.equals(parent.leftNodeId, nodeId)) {
             parent.leftNodeId = node.rightNodeId;
@@ -62,7 +62,7 @@ public class LinkCutTree implements TreeStructure {
     /**
      * Splay function, performs rotations, moving nodeId to the root of path binary tree
      *
-     * @param nodeId {@link Node} to put in the root
+     * @param nodeId {@link LCTNode} to put in the root
      */
     private void splay(Integer nodeId) {
         while (isNotRoot(nodeId)) {
@@ -79,7 +79,7 @@ public class LinkCutTree implements TreeStructure {
     /**
      * Link-Cut Tree basic function, restores path to Root from provided node
      *
-     * @param nodeId {@link Node} to restore the path from
+     * @param nodeId {@link LCTNode} to restore the path from
      * @return pathParent to root
      */
     private Integer expose(int nodeId) {
@@ -122,7 +122,7 @@ public class LinkCutTree implements TreeStructure {
 
     @Override
     public int addRoot() {
-        Node newNode = new Node(tree.size());
+        LCTNode newNode = new LCTNode(tree.size());
         tree.add(newNode);
         return newNode.nodeId;
     }

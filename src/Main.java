@@ -2,8 +2,10 @@ import java.util.List;
 
 public class Main {
     public static void main(String[] args) {
-        if (testTreeStructure(new LinkCutTree())) System.out.println("Passed Tests");
-        else System.out.println("Something doesn't quite work");
+        if (testTreeStructure(new LinkCutTree())) System.out.println("LinkCutTree Passed Tests");
+        else System.out.println("Something doesn't quite work in LinkCutTree");
+        if (testTreeStructure(new BinUps())) System.out.println("BinUps Passed Tests");
+        else System.out.println("Something doesn't quite work in BinUps");
     }
 
     public static boolean testTreeStructure(TreeStructure treeStructure) {
