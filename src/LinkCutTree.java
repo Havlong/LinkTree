@@ -140,6 +140,12 @@ public class LinkCutTree implements TreeStructure {
     }
 
     @Override
+    public boolean isParent(int parentNodeId, int childNodeId) {
+        Integer lca = getLca(parentNodeId, childNodeId);
+        return lca != null && lca == parentNodeId;
+    }
+
+    @Override
     public int rootId(int nodeId) {
         expose(nodeId);
         while (tree.get(nodeId).rightNodeId != null) nodeId = tree.get(nodeId).rightNodeId;

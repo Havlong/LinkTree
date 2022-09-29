@@ -62,4 +62,13 @@ public class BinUps implements TreeStructure {
         }
         return firstNode.nodeId;
     }
+
+    @Override
+    public boolean isParent(int parentNodeId, int childNodeId) {
+        BinUpsNode parentNode = tree.get(parentNodeId);
+        BinUpsNode childNode = tree.get(childNodeId);
+        if (childNode.depth < parentNode.depth) return false;
+        BinUpsNode childParentNode = tree.get(findLevelAncestor(childNodeId, childNode.depth - parentNode.depth));
+        return childParentNode.nodeId == parentNode.nodeId;
+    }
 }

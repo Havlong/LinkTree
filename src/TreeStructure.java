@@ -30,4 +30,13 @@ public interface TreeStructure {
      * @return nodeId of Node, that is ancestor to both nodes and has the deepest level of such nodes
      */
     Integer getLca(int firstNodeId, int secondNodeId);
+
+    /**
+     * Checks if one node is parent of another
+     *
+     * @param parentNodeId parent candidate nodeId
+     * @param childNodeId  child candidate nodeId
+     * @return true if parentNodeId is parent of childNodeId, else false is returned
+     */
+    boolean isParent(int parentNodeId, int childNodeId);
 }
